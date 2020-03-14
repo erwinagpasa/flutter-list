@@ -3,6 +3,16 @@ JSON Data with Refresh Indicator and List Detials Page
 
 <img src="details1.jpg" width="400">
 
+<dl>
+  <dt>Problem:</dt>
+  <dd>When I ontap a list it should go to the details screen and display the description</dd>
+
+  <dt>JSON Data</dt>
+  <dd>https://ikns.info/api/announcement_data.php</dd>
+</dl>
+
+
+
 
 ```
 import 'package:flutter/foundation.dart';
