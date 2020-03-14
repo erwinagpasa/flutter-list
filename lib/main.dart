@@ -1,131 +1,90 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Todo {
-  final String title;
-  final String description;
-
-  Todo(this.title, this.description);
-}
-
 void main() {
-  runApp(MaterialApp(
-    title: 'Passing Data',
-    home: TodosScreen(
-      
-      
-      todos: List.generate(
-        20,
-        (i) => Todo(
-          'Todo $i',
-          'A description of what needs to be done for Todo $i',
-        ),
-      ),
- 
- 
-    ),
+  runApp(new MaterialApp(
+    home: new HomePage(),
   ));
 }
 
-class TodosScreen extends StatefulWidget {
-  
-  
-  final List<Todo> todos;
-
-  TodosScreen({Key key, @required this.todos}) : super(key: key);
-
+class HomePage extends StatefulWidget {
   @override
-  _TodosScreenState createState() => _TodosScreenState();
+  HomePageState createState() => new HomePageState();
 }
 
-class _TodosScreenState extends State<TodosScreen> {
+class HomePageState extends State<HomePage> {
 
-   final String url = "https://ikns.info/api/announcement_data.php";
   List data;
- Future<String> getSWData() async {
-    refreshKey.currentState?.show(atTop: false);
-    //await Future.delayed(Duration(seconds: 2));
-    var res = await http.get(Uri.parse(url), headers: {"Accept": "application/json"});
 
-
-
-      if (mounted) {
-        setState(() {
-        data = json.decode(res.body); 
-        });
+  Future<String> getData() async {
+    var response = await http.get(
+      Uri.encodeFull("https://jsonplaceholder.typicode.com/posts"),
+      headers: {
+        "Accept": "application/json"
       }
+    );
 
-
-    return null;
+    this.setState(() {
+      data = jsonDecode(response.body);
+    });
+    print(data[1]["title"]);
+    
+    return "Success!";
   }
 
-    var refreshKey = GlobalKey<RefreshIndicatorState>();
-
-
-    @override
-    void initState() {
-      super.initState();
-        this.getSWData();
-    }
-
-    //initialize the icon in appbar
-    Icon actionIcon = new Icon(Icons.more_vert);
-
-
+  @override
+  void initState() {
+    super.initState();
+    this.getData();
+  }
 
   @override
   Widget build(BuildContext context) {
-   return new Scaffold(
-      backgroundColor: Colors.white,
+    return new Scaffold(
       appBar: new AppBar(
-          centerTitle: true,  //centering the title
-          title: new Text('Notification', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
-          actions: <Widget>[
-            new IconButton(
-              icon: actionIcon,
-              onPressed:(){
-                  Navigator.of(context).pushNamed('emailRoute');
-              },
-            ),
-          ],
-        ),
-      
-
-      body: RefreshIndicator(
-        key: refreshKey,
-        
-
-        child: ListView.builder(
-   
-
-           itemCount: data == null ? 0 : data.length,
-            itemBuilder: (BuildContext context, int index) {
-          return Container(
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                   Container(
-                        padding: EdgeInsets.all(15.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text(data[index]["title"],
-                                style: TextStyle(
-                                    fontSize: 18.0, color: Colors.black87)),
-                          ],
-                        )),
-                ],
-              ),
+        title: new Text("Listviews"),
+      ),
+      body: new ListView.builder(
+        itemCount: data == null ? 0 : data.length,
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+            onTap: () {
+                    Navigator.push(context, 
+                    new MaterialPageRoute(builder: (context) => DetailsPage(todo: data[index]))
+                    );
+                                    },
+                      child: new Card(
+              child: new Text(data[index]["title"]),
             ),
           );
         },
-        ),
+      ),
+    );
+  }
+}
 
-        onRefresh: getSWData,
+class Todo {
+  final String title;
+  Todo(this.title);
+}
+
+
+class DetailsPage extends StatelessWidget {
+  final Todo todo;
+   DetailsPage({Key key, @required this.todo}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+       appBar: new AppBar(
+        title: new Text("Listviews"),
+      ),
+
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text("todo.title"),
       ),
     );
   }
