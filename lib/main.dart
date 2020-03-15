@@ -19,19 +19,23 @@ class HomePageState extends State<HomePage> {
   List data;
   bool isLoading = false;
 
-  Future<String> getData() async {
+  Future<String> getData({isShowLoading: true}) async {
     refreshKey.currentState?.show(atTop: false);
     //await Future.delayed(Duration(seconds: 2));
-    setState(() {
-      isLoading = true;
-    });
+    if(isShowLoading){
+      setState(() {
+        isLoading = true;
+      });
+    }
     var response = await http.get(
         Uri.encodeFull("https://ikns.info/api/announcement_data.php"),
         headers: {"Accept": "application/json"});
     if (response.statusCode == 200) {
-      setState(() {
-        isLoading = false;
-      });
+      if (isShowLoading) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -60,27 +64,33 @@ class HomePageState extends State<HomePage> {
       appBar: new AppBar(
         title: new Text("Listviews"),
       ),
-      body: isLoading ? Center(child: Text('Loading...'),) : RefreshIndicator(
-        key: refreshKey,
-        child: new ListView.builder(
-          itemCount: data == null ? 0 : data.length,
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    new MaterialPageRoute(
-                        builder: (context) =>
-                            DetailsPage(todo: Todo.fromJson(data[index]))));
-              },
-              child: new Card(
-                child: new Text(data[index]["title"]),
+      body: isLoading
+          ? Center(
+              child: Text('Loading...'),
+            )
+          : RefreshIndicator(
+              key: refreshKey,
+              child: new ListView.builder(
+                itemCount: data == null ? 0 : data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => DetailsPage(
+                                  todo: Todo.fromJson(data[index]))));
+                    },
+                    child: new Card(
+                      child: new Text(data[index]["title"]),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-        onRefresh: getData,
-      ),
+              onRefresh: () async{
+                getData(isShowLoading: false);
+              },
+            ),
     );
   }
 }
