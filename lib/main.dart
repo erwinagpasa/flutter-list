@@ -20,6 +20,10 @@ class HomePageState extends State<HomePage> {
   List data;
 
   Future<String> getData() async {
+        refreshKey.currentState?.show(atTop: false);
+    //await Future.delayed(Duration(seconds: 2));
+
+
     var response = await http.get(
       Uri.encodeFull("https://ikns.info/api/announcement_data.php"),
       headers: {
@@ -27,19 +31,25 @@ class HomePageState extends State<HomePage> {
       }
     );
 
-    this.setState(() {
-      data = jsonDecode(response.body);
-    });
-    //print(data[1]["title"]);
+
+      if (mounted) {
+        setState(() {
+        data = jsonDecode(response.body);
+        });
+      }
+
     
     return "Success!";
   }
 
-  @override
-  void initState() {
-    super.initState();
-    this.getData();
-  }
+ var refreshKey = GlobalKey<RefreshIndicatorState>();
+
+@override
+    void initState() {
+      super.initState();
+        this.getData();
+    }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,20 +57,24 @@ class HomePageState extends State<HomePage> {
       appBar: new AppBar(
         title: new Text("Listviews"),
       ),
-      body: new ListView.builder(
-        itemCount: data == null ? 0 : data.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-            onTap: () {
-                    Navigator.push(context, 
-                    new MaterialPageRoute(builder: (context) => DetailsPage(todo:Todo.fromJson(data[index])))
-                    );
-                                    },
-                      child: new Card(
-              child: new Text(data[index]["title"]),
-            ),
-          );
-        },
+      body: RefreshIndicator(
+        key: refreshKey,
+              child: new ListView.builder(
+          itemCount: data == null ? 0 : data.length,
+          itemBuilder: (BuildContext context, int index) {
+            return GestureDetector(
+              onTap: () {
+                      Navigator.push(context, 
+                      new MaterialPageRoute(builder: (context) => DetailsPage(todo:Todo.fromJson(data[index])))
+                      );
+                                      },
+                        child: new Card(
+                child: new Text(data[index]["title"]),
+              ),
+            );
+          },
+        ), 
+        onRefresh: getData,
       ),
     );
   }
