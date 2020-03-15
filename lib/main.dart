@@ -58,13 +58,8 @@ class HomePageState extends State<HomePage> {
     this.getData();
   }
 
-  Future<Null> _onRefresh() {
-    Completer<Null> completer = new Completer<Null>();
-    Timer timer = new Timer(new Duration(seconds: 3), () {
-      completer.complete();
-      getData(isShowLoading: false);
-    });
-    return completer.future;
+  Future<Null> _onRefresh() async{
+    await getData(isShowLoading: false);
   }
 
   @override
