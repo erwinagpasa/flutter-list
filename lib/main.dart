@@ -59,9 +59,12 @@ class HomePageState extends State<HomePage> {
       ),
       body: RefreshIndicator(
         key: refreshKey,
+
+ 
               child: new ListView.builder(
           itemCount: data == null ? 0 : data.length,
           itemBuilder: (BuildContext context, int index) {
+            
             return GestureDetector(
               onTap: () {
                       Navigator.push(context, 
