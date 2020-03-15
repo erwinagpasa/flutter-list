@@ -21,7 +21,7 @@ class HomePageState extends State<HomePage> {
 
   Future<String> getData() async {
     var response = await http.get(
-      Uri.encodeFull("https://jsonplaceholder.typicode.com/posts"),
+      Uri.encodeFull("https://ikns.info/api/announcement_data.php"),
       headers: {
         "Accept": "application/json"
       }
@@ -30,7 +30,7 @@ class HomePageState extends State<HomePage> {
     this.setState(() {
       data = jsonDecode(response.body);
     });
-    print(data[1]["title"]);
+    //print(data[1]["title"]);
     
     return "Success!";
   }
@@ -53,7 +53,7 @@ class HomePageState extends State<HomePage> {
           return GestureDetector(
             onTap: () {
                     Navigator.push(context, 
-                    new MaterialPageRoute(builder: (context) => DetailsPage(todo: data[index]))
+                    new MaterialPageRoute(builder: (context) => DetailsPage(todo:Todo.fromJson(data[index])))
                     );
                                     },
                       child: new Card(
@@ -67,24 +67,33 @@ class HomePageState extends State<HomePage> {
 }
 
 class Todo {
+
   final String title;
-  Todo(this.title);
+  final String description;
+  Todo(this.description,this.title);
+
+  Todo.fromJson(
+    Map<String, dynamic> json) : 
+    title = json['title'], 
+    description = json['description'];
+
 }
 
 
 class DetailsPage extends StatelessWidget {
   final Todo todo;
+  
    DetailsPage({Key key, @required this.todo}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: new AppBar(
-        title: new Text("Listviews"),
+        title: new Text(todo.title),
       ),
 
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text("todo.title"),
+        child: Text(todo.description),
       ),
     );
   }
