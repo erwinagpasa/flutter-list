@@ -20,9 +20,9 @@ class HomePageState extends State<HomePage> {
   bool isLoading = false;
 
   Future<String> getData({isShowLoading: true}) async {
-    refreshKey.currentState?.show(atTop: false);
+    // refreshKey.currentState?.show(atTop: false);
     //await Future.delayed(Duration(seconds: 2));
-    if(isShowLoading){
+    if (isShowLoading) {
       setState(() {
         isLoading = true;
       });
@@ -58,6 +58,15 @@ class HomePageState extends State<HomePage> {
     this.getData();
   }
 
+  Future<Null> _onRefresh() {
+    Completer<Null> completer = new Completer<Null>();
+    Timer timer = new Timer(new Duration(seconds: 3), () {
+      completer.complete();
+      getData(isShowLoading: false);
+    });
+    return completer.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -87,9 +96,7 @@ class HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              onRefresh: () async{
-                getData(isShowLoading: false);
-              },
+              onRefresh: _onRefresh,
             ),
     );
   }
